@@ -85,9 +85,8 @@ to setup-people
     [
       set want-vaccinated? true
       set vaccinated 100
+      vaccination-benefits
     ]
-    ask turtles with [vaccinated = 100]
-    [ vaccination-benefits ]
     ;; Each individual has a 5% chance of starting out infected.
     ;; To mimic true KM conditions use "ask one-of turtles" instead.
     if (random-float 100 < 5)
