@@ -89,7 +89,6 @@ to setup-people
       set vaccinated 100
       vaccination-benefits
     ]
-
     ;; Each individual has a 5% chance of starting out infected.
     ;; To mimic true KM conditions use "ask one-of turtles" instead.
     if (random-float 100 < 5)
@@ -115,8 +114,9 @@ end
 ;; Red is an infected person
 
 to assign-color  ;; turtle procedure
-  (ifelse infected?
-    [ set color red ]
+  (ifelse
+    vaccinated > 50 and infected? [set color yellow]
+    infected? [ set color red ]
     vaccinated > 50 [ set color blue]
   [ set color scale-color green (min list temp-infection-threshold 100) 100 0 ])
 end
@@ -124,10 +124,10 @@ end
 ;; the vaccination bonuses people get on getting vaccinated
 ;; numbers can be changed. Possible sliders
 to vaccination-benefits
-  ask turtles with [vaccinated = 100] [
-    set recovery-time recovery-time - 10
-    set temp-infection-threshold 50
-  ]
+  set recovery-time recovery-time - 10
+  if (recovery-time < 0)
+  [ set recovery-time 0]
+  set temp-infection-threshold 50
   ;; vaccination-recovery-time = recovery-time - 10;; recover faster
   ;; vaccination-temp-infection-threshold = temp-infection-threshold + 10 * vaccination / 100 ;; higher threshold
   ;; temp-infection-threshold = 20 ;; higher threshold
@@ -151,6 +151,9 @@ to go
     [ infect
       maybe-recover ]
 
+  ask turtles with [vaccinated > 0]
+  [ reduce-vaccination-effectiveness ]
+
   if ticks mod 100 = 0 [
     ask turtles with [want-vaccinated?] [
       set vaccinated 100
@@ -160,7 +163,8 @@ to go
     ask n-of ((count turtles with [not want-vaccinated?] / 100) * 5) turtles with [not want-vaccinated?] [
       set vaccinated 100
     ]
-    vaccination-benefits
+    ask turtles with [vaccinated = 100]
+    [ vaccination-benefits ]
   ]
 
   ask turtles
@@ -168,6 +172,12 @@ to go
       calculate-r0 ]
 
   tick
+end
+
+to reduce-vaccination-effectiveness
+  set recovery-time recovery-time + 0.1
+  ;; set temp-infection-threshold temp-infection-threshold - 0.5 ;; not sure
+  set vaccinated vaccinated - 1
 end
 
 to reduce-temp-resistance
