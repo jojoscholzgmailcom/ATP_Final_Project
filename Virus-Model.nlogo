@@ -22,6 +22,8 @@ turtles-own
   infection-threshold       ;; Individual unchanging treshold
   temp-infection-threshold  ;; Treshold bonus through having gotten the disease
   recovery-chance
+  vaccinated   ;; If true, person is vaccinated. Maybe a value
+  want-vaccinated? ;; If true, person wants to get repeat vaccinations
 ]
 
 
@@ -42,11 +44,13 @@ to setup-people
     setxy random-xcor random-ycor
     set infected? false
     set susceptible? true
+    set want-vaccinated? false
 
 
     set shape "person"
     set color white
 
+    set vaccinated 0
     ;; Set the recovery time for each agent to fall on a
     ;; normal distribution around average recovery time
     set recovery-time random-normal average-recovery-time average-recovery-time / 4
@@ -71,6 +75,19 @@ to setup-people
     ]
     if recovery-time < 0 [ set recovery-time 0 ]
 
+    ;; Each individual has a 40% chance of getting vaccinated and wanting repeat vaccinations
+    ;;ask n-of ((initial-people / 100) * 40) turtles
+    ;;[
+    ;;  set want-vaccinated? true
+    ;;  set vaccinated? true
+    ;;]
+    if (random-float 100 < 40)
+    [
+      set want-vaccinated? true
+      set vaccinated 100
+      vaccination-benefits
+    ]
+
     ;; Each individual has a 5% chance of starting out infected.
     ;; To mimic true KM conditions use "ask one-of turtles" instead.
     if (random-float 100 < 5)
@@ -89,11 +106,23 @@ end
 ;; Red is an infected person
 
 to assign-color  ;; turtle procedure
-  ifelse infected?
+  (ifelse infected?
     [ set color red ]
-  [ set color scale-color green (min list temp-infection-threshold 100) 100 0 ]
+    vaccinated > 50 [ set color blue]
+  [ set color scale-color green (min list temp-infection-threshold 100) 100 0 ])
 end
 
+;; the vaccination bonuses people get on getting vaccinated
+;; numbers can be changed. Possible sliders
+to vaccination-benefits
+  ask turtles with [vaccinated = 100] [
+    set recovery-time recovery-time - 10
+    set temp-infection-threshold 50
+  ]
+  ;; vaccination-recovery-time = recovery-time - 10;; recover faster
+  ;; vaccination-temp-infection-threshold = temp-infection-threshold + 10 * vaccination / 100 ;; higher threshold
+  ;; temp-infection-threshold = 20 ;; higher threshold
+end
 
 ;;;
 ;;; GO PROCEDURES
@@ -112,6 +141,18 @@ to go
   ask turtles with [ infected? ]
     [ infect
       maybe-recover ]
+
+  if ticks mod 100 = 0 [
+    ask turtles with [want-vaccinated?] [
+      set vaccinated 100
+    ]
+
+
+    ask n-of ((count turtles with [not want-vaccinated?] / 100) * 5) turtles with [not want-vaccinated?] [
+      set vaccinated 100
+    ]
+    vaccination-benefits
+  ]
 
   ask turtles
     [ assign-color
@@ -288,7 +329,7 @@ initial-people
 initial-people
 50
 400
-100.0
+200.0
 5
 1
 NIL
@@ -431,7 +472,7 @@ cured-immunity-bonus
 cured-immunity-bonus
 0
 100
-44.0
+50.0
 1
 1
 NIL
@@ -446,7 +487,7 @@ immunity-divisor
 immunity-divisor
 0
 5
-1.08
+1.53
 0.01
 1
 NIL
