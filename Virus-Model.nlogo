@@ -24,6 +24,8 @@ turtles-own
   recovery-chance
   vaccinated   ;; If true, person is vaccinated. Maybe a value
   want-vaccinated? ;; If true, person wants to get repeat vaccinations
+
+  mask? ;; If true, the turtles wears a mask that prevents it from spreading the virus
 ]
 
 
@@ -97,6 +99,13 @@ to setup-people
       set infection-length random recovery-time
     ]
     assign-color
+
+    ;; Make turtles wear mask (not displayed visually)
+    set mask? false
+    if (random 100 < wearing-mask-chance)
+    [
+      set mask? true
+    ]
   ]
 end
 
@@ -178,7 +187,11 @@ end
 
 ;; Infection can occur to any susceptible person nearby
 to infect  ;; turtle procedure
-   let nearby-uninfected (turtles-on neighbors)
+
+  let infection-radius 10             ;; hyperparameter
+  if mask? [set infection-radius 1]   ;; hyperparameter
+
+   let nearby-uninfected (other turtles in-radius infection-radius)
      with [ not infected? ]
 
      if nearby-uninfected != nobody
@@ -489,6 +502,21 @@ immunity-divisor
 5
 1.53
 0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+78
+468
+250
+501
+wearing-mask-chance
+wearing-mask-chance
+0
+100
+50.0
+1
 1
 NIL
 HORIZONTAL
