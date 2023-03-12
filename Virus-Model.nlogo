@@ -167,7 +167,7 @@ end
 
 to reduce-vaccination-effectiveness
   set recovery-time recovery-time + 0.1
-  set temp-infection-threshold temp-infection-threshold - 0.5 ;; not sure
+  ;; set temp-infection-threshold temp-infection-threshold - 0.5 ;; not sure
   set vaccinated vaccinated - 1
 end
 
