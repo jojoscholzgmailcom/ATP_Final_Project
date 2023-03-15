@@ -55,7 +55,7 @@ to setup-people
     set vaccinated 0
     ;; Set the recovery time for each agent to fall on a
     ;; normal distribution around average recovery time
-    set recovery-time random-normal average-recovery-time average-recovery-time / 4
+    set recovery-time random-normal average-recovery-time 3
 
     set recovery-chance random-normal average-recovery-chance 3
 
@@ -124,7 +124,7 @@ end
 ;; the vaccination bonuses people get on getting vaccinated
 ;; numbers can be changed. Possible sliders
 to vaccination-benefits
-  set recovery-time recovery-time * 0.9
+  set recovery-time recovery-time * 0.65
   if (recovery-time < 0)
   [ set recovery-time 0]
   set temp-infection-threshold temp-infection-threshold + 50
@@ -175,7 +175,7 @@ to go
 end
 
 to reduce-vaccination-effectiveness
-  set recovery-time recovery-time + 0.1
+  set recovery-time recovery-time + 0.05
   ;; set temp-infection-threshold temp-infection-threshold - 0.5 ;; not sure
   set vaccinated vaccinated - 1
 end
@@ -198,7 +198,7 @@ end
 ;; Infection can occur to any susceptible person nearby
 to infect  ;; turtle procedure
 
-  let infection-radius 10             ;; hyperparameter
+  let infection-radius 2             ;; hyperparameter
   if mask? [set infection-radius 1]   ;; hyperparameter
 
    let nearby-uninfected (other turtles in-radius infection-radius)
@@ -284,9 +284,9 @@ end
 @#$#@#$#@
 GRAPHICS-WINDOW
 644
-13
+12
 1102
-472
+471
 -1
 -1
 18.0
@@ -306,7 +306,7 @@ GRAPHICS-WINDOW
 1
 1
 1
-hours
+days
 30.0
 
 BUTTON
@@ -420,7 +420,7 @@ average-recovery-chance
 average-recovery-chance
 10
 100
-60.0
+50.0
 5
 1
 NIL
@@ -452,10 +452,10 @@ SLIDER
 90
 average-recovery-time
 average-recovery-time
-50
-300
-100.0
-10
+5
+20
+12.0
+1
 1
 NIL
 HORIZONTAL
@@ -541,6 +541,24 @@ vaccines?
 0
 1
 -1000
+
+PLOT
+1115
+17
+1315
+167
+recovery time distribution
+NIL
+NIL
+4.0
+20.0
+0.0
+200.0
+false
+false
+"set-histogram-num-bars 20" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [recovery-time] of turtles"
 
 @#$#@#$#@
 ## WHAT IS IT?
