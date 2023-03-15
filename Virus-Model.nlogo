@@ -83,7 +83,7 @@ to setup-people
     ;;  set want-vaccinated? true
     ;;  set vaccinated? true
     ;;]
-    if (random-float 100 < 40)
+    if (random-float 100 < 40 and vaccines?)
     [
       set want-vaccinated? true
       set vaccinated 100
@@ -91,7 +91,7 @@ to setup-people
     ]
     ;; Each individual has a 5% chance of starting out infected.
     ;; To mimic true KM conditions use "ask one-of turtles" instead.
-    if (random-float 100 < 5)
+    if (random-float 100 < 5 and not want-vaccinated?)
     [
       set infected? true
       set susceptible? false
@@ -154,7 +154,7 @@ to go
   ask turtles with [vaccinated > 0]
   [ reduce-vaccination-effectiveness ]
 
-  if ticks mod 100 = 0 [
+  if (ticks mod 100 = 0 and vaccines?) [
     ask turtles with [want-vaccinated?] [
       set vaccinated 100
     ]
@@ -487,10 +487,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-402
-531
-574
-564
+276
+527
+448
+560
 cured-immunity-bonus
 cured-immunity-bonus
 0
@@ -502,10 +502,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-421
-482
-593
-515
+274
+467
+446
+500
 immunity-divisor
 immunity-divisor
 0
@@ -530,6 +530,17 @@ wearing-mask-chance
 1
 NIL
 HORIZONTAL
+
+SWITCH
+464
+468
+567
+501
+vaccines?
+vaccines?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
