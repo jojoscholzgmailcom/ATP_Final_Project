@@ -124,7 +124,7 @@ end
 ;; the vaccination bonuses people get on getting vaccinated
 ;; numbers can be changed. Possible sliders
 to vaccination-benefits
-  set recovery-time recovery-time - 10
+  set recovery-time recovery-time * 0.9
   if (recovery-time < 0)
   [ set recovery-time 0]
   set temp-infection-threshold temp-infection-threshold + 50
@@ -454,7 +454,7 @@ average-recovery-time
 average-recovery-time
 50
 300
-220.0
+100.0
 10
 1
 NIL
@@ -510,7 +510,7 @@ immunity-divisor
 immunity-divisor
 1
 5
-1.0
+1.01
 0.01
 1
 NIL
@@ -538,7 +538,7 @@ SWITCH
 501
 vaccines?
 vaccines?
-1
+0
 1
 -1000
 
