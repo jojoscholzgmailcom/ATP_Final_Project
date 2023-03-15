@@ -118,7 +118,7 @@ to assign-color  ;; turtle procedure
     vaccinated > 50 and infected? [set color yellow]
     infected? [ set color red ]
     vaccinated > 50 [ set color blue]
-  [ set color scale-color green (min list temp-infection-threshold 100) 100 0 ])
+  [ set color scale-color green (min list temp-infection-threshold 100) 200 0 ])
 end
 
 ;; the vaccination bonuses people get on getting vaccinated
@@ -127,7 +127,7 @@ to vaccination-benefits
   set recovery-time recovery-time - 10
   if (recovery-time < 0)
   [ set recovery-time 0]
-  set temp-infection-threshold 50
+  set temp-infection-threshold temp-infection-threshold + 50
   ;; vaccination-recovery-time = recovery-time - 10;; recover faster
   ;; vaccination-temp-infection-threshold = temp-infection-threshold + 10 * vaccination / 100 ;; higher threshold
   ;; temp-infection-threshold = 20 ;; higher threshold
@@ -244,7 +244,7 @@ to calculate-r0
   let susceptible-t
     initial-people -
     count turtles with [ infected? ] -
-    count turtles with [ infection-threshold + temp-infection-threshold > 100 ]
+    count turtles with [ not infected? and infection-threshold + temp-infection-threshold > 100 ]
 
   ;; Initial number of susceptibles:
   let s0 count turtles with [ susceptible? ]
@@ -508,9 +508,9 @@ SLIDER
 500
 immunity-divisor
 immunity-divisor
-0
+1
 5
-1.53
+1.0
 0.01
 1
 NIL
