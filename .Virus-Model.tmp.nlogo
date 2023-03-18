@@ -154,7 +154,7 @@ to go
   ask turtles with [vaccinated > 0]
   [ reduce-vaccination-effectiveness ]
 
-  if (vaccines? and ticks >= vaccination-start and (ticks - vaccination-start) mod vaccination-frequency = 0) [
+  if (vaccines? and ticks >= vaccination-start and (ticks - vaccination-start mod vaccination-frequency = 0) [
     print("Jabs time!")
     ask turtles with [want-vaccinated?] [
       set vaccinated 100
