@@ -39,7 +39,6 @@ to setup
   reset-ticks
 end
 
-
 to setup-people
   create-turtles initial-people
   [
