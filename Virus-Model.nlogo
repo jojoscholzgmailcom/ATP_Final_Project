@@ -11,6 +11,8 @@ globals
   isolation-x-center
   isolation-y-center
   isolation-radius
+  isolation-x
+  isolation-y
 ]
 
 turtles-own
@@ -40,13 +42,16 @@ turtles-own
 to setup
   clear-all
   setup-people
-  setup-isolation
+  if are-isolating?
+  [
+    setup-isolation
+  ]
   reset-ticks
 end
 
 to setup-isolation
-  let isolation-x max-pxcor - 3
-  let isolation-y max-pycor - 3
+  set isolation-x max-pxcor - 2
+  set isolation-y max-pycor - 2
   set isolation-x-center (max-pxcor - isolation-x) / 2 + isolation-x
   set isolation-y-center (max-pycor - isolation-y) / 2 + isolation-y
   set isolation-radius max-pxcor - isolation-x + 1
@@ -71,6 +76,7 @@ to setup-people
     set infected? false
     set susceptible? true
     set want-vaccinated? false
+    set isolated? false
 
 
     set shape "person"
@@ -211,19 +217,22 @@ end
 
 ;; People move about at random.
 to move  ;; turtle procedure
-  rt random-float 360
-  let isolation-heading-diff subtract-headings towardsxy max-pxcor max-pycor heading
-  if distancexy isolation-x-center isolation-y-center < isolation-radius and abs isolation-heading-diff < 90
+  if not isolated?
   [
-    ifelse isolation-heading-diff < 0
+    rt random-float 360
+    let isolation-heading-diff subtract-headings towardsxy max-pxcor max-pycor heading
+    if distancexy isolation-x-center isolation-y-center < isolation-radius and abs isolation-heading-diff < 90 and are-isolating?
     [
-      rt 91 + isolation-heading-diff
+      ifelse isolation-heading-diff < 0
+      [
+        rt 91 + isolation-heading-diff
+      ]
+      [
+        lt 91 - isolation-heading-diff
+      ]
     ]
-    [
-      lt 91 - isolation-heading-diff
-    ]
+    fd 1
   ]
-  fd 1
 end
 
 to clear-count
@@ -233,6 +242,14 @@ end
 
 ;; Infection can occur to any susceptible person nearby
 to infect  ;; turtle procedure
+  if infection-length = 2 and are-isolating?
+  [
+    if random 100 < isolation-chance
+    [
+      set isolated? true
+      setxy isolation-x-center isolation-y-center
+    ]
+  ]
 
   let infection-radius 2             ;; hyperparameter
   if mask? [set infection-radius 1]   ;; hyperparameter
@@ -240,7 +257,7 @@ to infect  ;; turtle procedure
    let nearby-uninfected (other turtles in-radius infection-radius)
      with [ not infected? ]
 
-     if nearby-uninfected != nobody
+     if not isolated? and nearby-uninfected != nobody
      [ ask nearby-uninfected
        [ if random-float 100 < infection-chance and (infection-threshold + temp-infection-threshold) < random-float 100
          [ set infected? true
@@ -262,6 +279,15 @@ to maybe-recover
       set temp-infection-threshold temp-infection-threshold + cured-immunity-bonus
       set infection-length 0
       set nb-recovered (nb-recovered + 1)
+      if isolated?
+      [
+        set isolated? false
+        setxy random-xcor random-ycor
+        while [xcor >= isolation-x and ycor >= isolation-y]
+        [
+          setxy random-xcor random-ycor
+        ]
+      ]
     ]
   ]
 end
@@ -640,6 +666,17 @@ isolation-chance
 1
 NIL
 HORIZONTAL
+
+SWITCH
+304
+621
+433
+654
+are-isolating?
+are-isolating?
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
