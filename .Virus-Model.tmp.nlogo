@@ -8,6 +8,9 @@ globals
   r0                    ;; The number of secondary infections that arise
                         ;; due to a single infected introduced in a wholly
                         ;; susceptible population
+  isolation-x-center
+  isolation-y-center
+  isolation-radius
 ]
 
 turtles-own
@@ -26,6 +29,7 @@ turtles-own
   want-vaccinated? ;; If true, person wants to get repeat vaccinations
 
   mask? ;; If true, the turtle wears a mask that prevents it from spreading the virus
+  isolated? ;; Is Agent isolating
 ]
 
 
@@ -36,7 +40,27 @@ turtles-own
 to setup
   clear-all
   setup-people
+  setup-isolation
   reset-ticks
+end
+
+to setup-isolation
+  let isolation-x max-pxcor -
+  let isolation-y max-pycor - 5
+  set isolation-x-center (max-pxcor - isolation-x) / 2 + isolation-x
+  set isolation-y-center (max-pycor - isolation-y) / 2 + isolation-y
+  set isolation-radius max-pxcor - isolation-x + 1
+  ask patches with [pxcor >= isolation-x and pycor >= isolation-y]
+  [
+    set pcolor brown
+  ]
+  while [any? turtles-on patches with [pxcor >= isolation-x and pycor >= isolation-y]]
+  [
+    ask turtles-on patches with [pxcor >= isolation-x and pycor >= isolation-y]
+    [
+      setxy random-xcor random-ycor
+    ]
+  ]
 end
 
 
@@ -154,7 +178,7 @@ to go
   ask turtles with [vaccinated > 0]
   [ reduce-vaccination-effectiveness ]
 
-  if (vaccines? and ticks >= vaccination-start and (ticks - vaccination-start mod vaccination-frequency = 0) [
+  if (vaccines? and ticks >= vaccination-start and (ticks - vaccination-start) mod vaccination-frequency = 0) [
     print("Jabs time!")
     ask turtles with [want-vaccinated?] [
       set vaccinated 100
@@ -188,6 +212,17 @@ end
 ;; People move about at random.
 to move  ;; turtle procedure
   rt random-float 360
+  let isolation-heading-diff subtract-headings towardsxy max-pxcor max-pycor heading
+  if distancexy isolation-x-center isolation-y-center < isolation-radius and abs isolation-heading-diff < 90
+  [
+    ifelse isolation-heading-diff < 0
+    [
+      rt 91 + isolation-heading-diff
+    ]
+    [
+      lt 91 - isolation-heading-diff
+    ]
+  ]
   fd 1
 end
 
@@ -587,6 +622,21 @@ vaccination-frequency
 1000
 50.0
 10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+71
+609
+243
+642
+isolation-chance
+isolation-chance
+0
+100
+50.0
+1
 1
 NIL
 HORIZONTAL
