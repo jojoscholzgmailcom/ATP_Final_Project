@@ -198,15 +198,17 @@ end
 ;; Infection can occur to any susceptible person nearby
 to infect  ;; turtle procedure
 
-  let infection-radius 2             ;; hyperparameter
-  if mask? [set infection-radius 1]   ;; hyperparameter
+  let current-infection-chance infection-chance
+  if mask? [
+    set current-infection-chance (current-infection-chance * (mask-infection-chance-reduction / 100))
+  ]
 
    let nearby-uninfected (other turtles in-radius infection-radius)
      with [ not infected? ]
 
      if nearby-uninfected != nobody
      [ ask nearby-uninfected
-       [ if random-float 100 < infection-chance and (infection-threshold + temp-infection-threshold) < random-float 100
+       [ if random-float 100 < current-infection-chance and (infection-threshold + temp-infection-threshold) < random-float 100
          [ set infected? true
            set nb-infected (nb-infected + 1)
          ]
@@ -517,15 +519,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-78
-468
-250
-501
+1113
+323
+1285
+356
 wearing-mask-chance
 wearing-mask-chance
 0
 100
-50.0
+70.0
 1
 1
 NIL
@@ -586,6 +588,36 @@ vaccination-frequency
 1000
 50.0
 10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1112
+369
+1332
+402
+mask-infection-chance-reduction
+mask-infection-chance-reduction
+0
+100
+70.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1114
+415
+1286
+448
+infection-radius
+infection-radius
+0
+10
+1.0
+0.1
 1
 NIL
 HORIZONTAL
