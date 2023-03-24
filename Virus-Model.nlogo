@@ -13,6 +13,9 @@ globals
   isolation-radius
   isolation-x
   isolation-y
+  maxpeople             ;; max number of people allowed in the world
+  deaths                ;; the number of people who died
+  totalPeople          ;; the total number of people who existed in the world
 ]
 
 turtles-own
@@ -41,6 +44,9 @@ turtles-own
 
 to setup
   clear-all
+  set maxpeople initial-people * 1.5
+  set deaths 0
+  set totalPeople initial-people
   setup-people
   if are-isolating?
   [
@@ -158,9 +164,6 @@ to vaccination-benefits
   if (recovery-time < 0)
   [ set recovery-time 0]
   set temp-infection-threshold temp-infection-threshold + 50
-  ;; vaccination-recovery-time = recovery-time - 10;; recover faster
-  ;; vaccination-temp-infection-threshold = temp-infection-threshold + 10 * vaccination / 100 ;; higher threshold
-  ;; temp-infection-threshold = 20 ;; higher threshold
 end
 
 ;;;
@@ -179,6 +182,7 @@ to go
 
   ask turtles with [ infected? ]
     [ infect
+      maybe-die
       maybe-recover ]
 
   ask turtles with [vaccinated > 0]
@@ -292,6 +296,13 @@ to maybe-recover
       ]
     ]
   ]
+end
+
+to maybe-die
+  ;; lower recovery time means higher death chance
+  ;;if (statement)
+  ;;[ set deaths deaths + 1
+  ;;
 end
 
 to calculate-r0
@@ -709,6 +720,17 @@ infection-radius
 1
 NIL
 HORIZONTAL
+
+SWITCH
+1117
+485
+1248
+518
+DoPeopleDie?
+DoPeopleDie?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
