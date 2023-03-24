@@ -13,7 +13,8 @@ globals
   isolation-radius
   isolation-x
   isolation-y
-  maxpeople             ;; max number of people allowed in the world
+  maxPeople             ;; max number of people allowed in the world
+  currentPeople         ;; the number of current people
   deaths                ;; the number of people who died
   totalPeople          ;; the total number of people who existed in the world
 ]
@@ -44,7 +45,8 @@ turtles-own
 
 to setup
   clear-all
-  set maxpeople initial-people * 1.5
+  set maxPeople initial-people * 1.5
+  set currentPeople initial-people
   set deaths 0
   set totalPeople initial-people
   setup-people
@@ -182,7 +184,7 @@ to go
 
   ask turtles with [ infected? ]
     [ infect
-      maybe-die
+      if DoPeopleDie? [ maybe-die ]
       maybe-recover ]
 
   ask turtles with [vaccinated > 0]
@@ -204,7 +206,8 @@ to go
 
   ask turtles
     [ assign-color
-      calculate-r0 ]
+      calculate-r0
+      if DoPeopleDie? [ maybe-add-people ] ]
 
   tick
 end
@@ -300,9 +303,20 @@ end
 
 to maybe-die
   ;; lower recovery time means higher death chance
-  ;;if (statement)
-  ;;[ set deaths deaths + 1
-  ;;
+  ;;if (statement) [
+  ;;  set deaths deaths + 1
+  ;;  set currentPeople currentPeople - 1
+  ;;  die
+  ;; ]
+end
+
+to maybe-add-people
+  if maxPeople > currentPeople [
+    if random-float 100 < 0.1 [
+      hatch 1 [ rt random-float 360 fd 1 ]
+      set currentPeople currentPeople + 1
+    ]
+  ]
 end
 
 to calculate-r0
@@ -702,7 +716,7 @@ SWITCH
 654
 are-isolating?
 are-isolating?
-0
+1
 1
 -1000
 
@@ -728,9 +742,20 @@ SWITCH
 518
 DoPeopleDie?
 DoPeopleDie?
-1
+0
 1
 -1000
+
+MONITOR
+789
+575
+882
+620
+NIL
+CurrentPeople
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
