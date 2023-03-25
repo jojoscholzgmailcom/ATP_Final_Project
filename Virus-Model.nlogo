@@ -90,7 +90,29 @@ to setup-people
     set shape "person"
     set color white
 
-    set vaccinated 0
+    init-person
+
+    ;; Each individual has a 5% chance of starting out infected.
+    ;; To mimic true KM conditions use "ask one-of turtles" instead.
+    if (random-float 100 < 5 and not want-vaccinated?)
+    [
+      set infected? true
+      set susceptible? false
+      set infection-length random recovery-time
+    ]
+    assign-color
+
+    ;; Make turtles wear mask (not displayed visually)
+    set mask? false
+    if (random 100 < wearing-mask-chance)
+    [
+      set mask? true
+    ]
+  ]
+end
+
+to init-person
+  set vaccinated 0
     ;; Set the recovery time for each agent to fall on a
     ;; normal distribution around average recovery time
     set recovery-time random-normal average-recovery-time 3
@@ -127,23 +149,6 @@ to setup-people
       ;; set vaccinated 100
       ;; vaccination-benefits
     ]
-    ;; Each individual has a 5% chance of starting out infected.
-    ;; To mimic true KM conditions use "ask one-of turtles" instead.
-    if (random-float 100 < 5 and not want-vaccinated?)
-    [
-      set infected? true
-      set susceptible? false
-      set infection-length random recovery-time
-    ]
-    assign-color
-
-    ;; Make turtles wear mask (not displayed visually)
-    set mask? false
-    if (random 100 < wearing-mask-chance)
-    [
-      set mask? true
-    ]
-  ]
 end
 
 ;; Different people are displayed in 3 different colors depending on health
@@ -314,7 +319,7 @@ end
 to maybe-add-people
   if maxPeople > currentPeople [
     if random-float 100 < 0.1 [
-      hatch 1 [ rt random-float 360 fd 1 ]
+      hatch 1 [ rt random-float 360 fd 1 init-person ]
       set currentPeople currentPeople + 1
       set totalPeople totalPeople + 1
     ]
@@ -718,7 +723,7 @@ SWITCH
 654
 are-isolating?
 are-isolating?
-1
+0
 1
 -1000
 
