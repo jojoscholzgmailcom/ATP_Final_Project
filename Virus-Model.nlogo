@@ -301,13 +301,14 @@ to maybe-recover
   ]
 end
 
+;;values can change
 to maybe-die
   ;; lower recovery time means higher death chance
-  ;;if (statement) [
-  ;;  set deaths deaths + 1
-  ;;  set currentPeople currentPeople - 1
-  ;;  die
-  ;; ]
+  if random-float 100 < (recovery-time * 0.02 + temp-infection-threshold * 0.01) / 2 [
+    set deaths deaths + 1
+    set currentPeople currentPeople - 1
+    die
+  ]
 end
 
 to maybe-add-people
@@ -315,6 +316,7 @@ to maybe-add-people
     if random-float 100 < 0.1 [
       hatch 1 [ rt random-float 360 fd 1 ]
       set currentPeople currentPeople + 1
+      set totalPeople totalPeople + 1
     ]
   ]
 end
@@ -331,7 +333,7 @@ to calculate-r0
 
   ;; Number of susceptibles now:
   let susceptible-t
-    initial-people -
+    currentPeople -
     count turtles with [ infected? ] -
     count turtles with [ not infected? and infection-threshold + temp-infection-threshold > 100 ]
 
@@ -354,10 +356,10 @@ to calculate-r0
   ]
 
   ;; Prevent division by 0:
-  if initial-people - susceptible-t != 0 and susceptible-t != 0
+  if currentPeople - susceptible-t != 0 and susceptible-t != 0
   [
     ;; This is derived from integrating dI / dS = (beta*SI - gamma*I) / (-beta*SI):
-    set r0 (ln (s0 / susceptible-t) / (initial-people - susceptible-t))
+    set r0 (ln (s0 / susceptible-t) / (currentPeople - susceptible-t))
     ;; Assuming one infected individual introduced in the beginning,
     ;; and hence counting I(0) as negligible, we get the relation:
     ;; N - gamma*ln(S(0)) / beta = S(t) - gamma*ln(S(t)) / beta,
@@ -627,7 +629,7 @@ SWITCH
 232
 vaccines?
 vaccines?
-0
+1
 1
 -1000
 
@@ -753,6 +755,17 @@ MONITOR
 620
 NIL
 CurrentPeople
+17
+1
+11
+
+MONITOR
+707
+576
+764
+621
+NIL
+deaths
 17
 1
 11
