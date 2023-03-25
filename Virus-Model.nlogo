@@ -303,8 +303,8 @@ end
 
 ;;values can change
 to maybe-die
-  ;; lower recovery time means higher death chance
-  if random-float 100 < (recovery-time * 0.02 + temp-infection-threshold * 0.01) / 2 [
+  ;; lower recovery time means higher death chance, immunization means lower death chance
+  if random-float 100 < recovery-time * 0.02 - temp-infection-threshold * 0.001 [
     set deaths deaths + 1
     set currentPeople currentPeople - 1
     die
