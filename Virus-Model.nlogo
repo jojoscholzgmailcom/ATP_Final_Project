@@ -13,6 +13,10 @@ globals
   isolation-radius
   isolation-x
   isolation-y
+  maxPeople             ;; max number of people allowed in the world
+  currentPeople         ;; the number of current people
+  deaths                ;; the number of people who died
+  totalPeople          ;; the total number of people who existed in the world
 ]
 
 turtles-own
@@ -41,6 +45,10 @@ turtles-own
 
 to setup
   clear-all
+  set maxPeople initial-people * 1.5
+  set currentPeople initial-people
+  set deaths 0
+  set totalPeople initial-people
   setup-people
   if are-isolating?
   [
@@ -158,9 +166,6 @@ to vaccination-benefits
   if (recovery-time < 0)
   [ set recovery-time 0]
   set temp-infection-threshold temp-infection-threshold + 50
-  ;; vaccination-recovery-time = recovery-time - 10;; recover faster
-  ;; vaccination-temp-infection-threshold = temp-infection-threshold + 10 * vaccination / 100 ;; higher threshold
-  ;; temp-infection-threshold = 20 ;; higher threshold
 end
 
 ;;;
@@ -179,6 +184,7 @@ to go
 
   ask turtles with [ infected? ]
     [ infect
+      if DoPeopleDie? [ maybe-die ]
       maybe-recover ]
 
   ask turtles with [vaccinated > 0]
@@ -200,7 +206,8 @@ to go
 
   ask turtles
     [ assign-color
-      calculate-r0 ]
+      calculate-r0
+      if DoPeopleDie? [ maybe-add-people ] ]
 
   tick
 end
@@ -294,6 +301,26 @@ to maybe-recover
   ]
 end
 
+;;values can change
+to maybe-die
+  ;; lower recovery time means higher death chance, immunization means lower death chance
+  if random-float 100 < recovery-time * 0.02 - temp-infection-threshold * 0.001 [
+    set deaths deaths + 1
+    set currentPeople currentPeople - 1
+    die
+  ]
+end
+
+to maybe-add-people
+  if maxPeople > currentPeople [
+    if random-float 100 < 0.1 [
+      hatch 1 [ rt random-float 360 fd 1 ]
+      set currentPeople currentPeople + 1
+      set totalPeople totalPeople + 1
+    ]
+  ]
+end
+
 to calculate-r0
 
   let new-infected sum [ nb-infected ] of turtles
@@ -306,7 +333,7 @@ to calculate-r0
 
   ;; Number of susceptibles now:
   let susceptible-t
-    initial-people -
+    currentPeople -
     count turtles with [ infected? ] -
     count turtles with [ not infected? and infection-threshold + temp-infection-threshold > 100 ]
 
@@ -329,10 +356,10 @@ to calculate-r0
   ]
 
   ;; Prevent division by 0:
-  if initial-people - susceptible-t != 0 and susceptible-t != 0
+  if currentPeople - susceptible-t != 0 and susceptible-t != 0
   [
     ;; This is derived from integrating dI / dS = (beta*SI - gamma*I) / (-beta*SI):
-    set r0 (ln (s0 / susceptible-t) / (initial-people - susceptible-t))
+    set r0 (ln (s0 / susceptible-t) / (currentPeople - susceptible-t))
     ;; Assuming one infected individual introduced in the beginning,
     ;; and hence counting I(0) as negligible, we get the relation:
     ;; N - gamma*ln(S(0)) / beta = S(t) - gamma*ln(S(t)) / beta,
@@ -602,7 +629,7 @@ SWITCH
 232
 vaccines?
 vaccines?
-0
+1
 1
 -1000
 
@@ -691,7 +718,7 @@ SWITCH
 654
 are-isolating?
 are-isolating?
-0
+1
 1
 -1000
 
@@ -709,6 +736,39 @@ infection-radius
 1
 NIL
 HORIZONTAL
+
+SWITCH
+1117
+485
+1248
+518
+DoPeopleDie?
+DoPeopleDie?
+0
+1
+-1000
+
+MONITOR
+789
+575
+882
+620
+NIL
+CurrentPeople
+17
+1
+11
+
+MONITOR
+707
+576
+764
+621
+NIL
+deaths
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
