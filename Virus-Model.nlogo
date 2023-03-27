@@ -143,7 +143,7 @@ to init-person
     ;;  set want-vaccinated? true
     ;;  set vaccinated? true
     ;;]
-    if (random-float 100 < 40 and vaccines?)
+    if (random-float 100 < 10  and vaccines?)
     [
       set want-vaccinated? true
       ;; set vaccinated 100
@@ -501,7 +501,7 @@ infection-chance
 infection-chance
 10
 100
-55.0
+80.0
 5
 1
 NIL
@@ -516,7 +516,7 @@ average-recovery-chance
 average-recovery-chance
 10
 100
-50.0
+100.0
 5
 1
 NIL
@@ -550,7 +550,7 @@ average-recovery-time
 average-recovery-time
 5
 20
-12.0
+9.0
 1
 1
 NIL
@@ -576,7 +576,7 @@ average-infection-threshold
 average-infection-threshold
 0
 100
-10.0
+31.0
 1
 1
 NIL
@@ -591,7 +591,7 @@ cured-immunity-bonus
 cured-immunity-bonus
 0
 100
-50.0
+81.0
 1
 1
 NIL
@@ -606,7 +606,7 @@ immunity-divisor
 immunity-divisor
 1
 5
-1.01
+1.1
 0.01
 1
 NIL
@@ -621,7 +621,7 @@ wearing-mask-chance
 wearing-mask-chance
 0
 100
-70.0
+31.0
 1
 1
 NIL
@@ -634,7 +634,7 @@ SWITCH
 232
 vaccines?
 vaccines?
-1
+0
 1
 -1000
 
@@ -665,7 +665,7 @@ vaccination-start
 vaccination-start
 0
 1000
-50.0
+0.0
 10
 1
 NIL
@@ -680,7 +680,7 @@ vaccination-frequency
 vaccination-frequency
 0
 1000
-50.0
+10.0
 10
 1
 NIL
@@ -695,7 +695,7 @@ isolation-chance
 isolation-chance
 1
 100
-50.0
+60.0
 1
 1
 NIL
@@ -710,7 +710,7 @@ mask-infection-chance-reduction
 mask-infection-chance-reduction
 0
 100
-70.0
+61.0
 1
 1
 NIL
@@ -736,7 +736,7 @@ infection-radius
 infection-radius
 0
 10
-1.0
+2.7
 0.1
 1
 NIL
@@ -774,6 +774,24 @@ deaths
 17
 1
 11
+
+PLOT
+475
+466
+675
+616
+R0
+hours
+R0
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot r0"
 
 @#$#@#$#@
 ## WHAT IS IT?
