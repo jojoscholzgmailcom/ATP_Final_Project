@@ -181,7 +181,7 @@ end
 
 
 to go
-  if ticks = 185 [stop] ;; 6 months
+  if ticks = 210 [stop] ;; 6 months
 
   if all? turtles [ not infected? ]
     [ stop ]
@@ -468,7 +468,7 @@ Populations
 day
 % of people
 0.0
-180.0
+210.0
 0.0
 100.0
 false
@@ -563,7 +563,7 @@ average-infection-threshold
 average-infection-threshold
 0
 100
-31.0
+25.0
 1
 1
 NIL
@@ -652,7 +652,7 @@ vaccination-start
 vaccination-start
 0
 180
-0.0
+30.0
 10
 1
 NIL
