@@ -16,6 +16,7 @@ globals
   maxPeople             ;; max number of people allowed in the world
   currentPeople         ;; the number of current people
   deaths                ;; the number of people who died
+  weekly-deaths         ;; the number of people who died this week
   totalPeople          ;; the total number of people who existed in the world
 ]
 
@@ -48,6 +49,7 @@ to setup
   set maxPeople initial-people * 1.5
   set currentPeople initial-people
   set deaths 0
+  set weekly-deaths 0
   set totalPeople initial-people
   setup-people
   if are-isolating?
@@ -179,6 +181,8 @@ end
 
 
 to go
+  if ticks = 185 [stop] ;; 6 months
+
   if all? turtles [ not infected? ]
     [ stop ]
 
@@ -195,7 +199,7 @@ to go
   ask turtles with [vaccinated > 0]
   [ reduce-vaccination-effectiveness ]
 
-  if (vaccines? and ticks >= vaccination-start and (ticks - vaccination-start) mod vaccination-frequency = 0) [
+  if (vaccines? and ticks >= vaccination-start and (ticks - vaccination-start) mod vaccination-window-frequency = 0) [
     print("Jabs time!")
     ask turtles with [want-vaccinated?] [
       set vaccinated 100
@@ -311,6 +315,7 @@ to maybe-die
   ;; lower recovery time means higher death chance, immunization means lower death chance
   if random-float 100 < recovery-time * 0.02 - temp-infection-threshold * 0.001 [
     set deaths deaths + 1
+    set weekly-deaths weekly-deaths + 1
     set currentPeople currentPeople - 1
     die
   ]
@@ -455,29 +460,30 @@ NIL
 HORIZONTAL
 
 PLOT
-342
-165
-636
-295
+31
+161
+576
+300
 Populations
-hours
-# of people
+day
+% of people
 0.0
-10.0
+180.0
 0.0
-10.0
-true
+100.0
+false
 true
 "" ""
 PENS
-"Infected" 1.0 0 -2674135 true "" "plot count turtles with [ infected? ]"
-"Not Infected" 1.0 0 -10899396 true "" "plot count turtles with [ not infected? ]"
+"Infected" 1.0 0 -2674135 true "" "plot 100 * count turtles with [ infected? ] / count turtles"
+"Infected and vaccinated" 1.0 0 -1184463 true "" "plot 100 * count turtles with [infected? and vaccinated > 50] / count turtles"
+"Vaccinated" 1.0 0 -13791810 true "" "plot 100 * count turtles with [vaccinated > 50] / count turtles"
 
 PLOT
-15
-307
-334
-443
+74
+308
+479
+452
 Infection and Recovery Rates
 hours
 rate
@@ -522,25 +528,6 @@ average-recovery-chance
 NIL
 HORIZONTAL
 
-PLOT
-15
-165
-333
-293
-Infected and Resistance
-hours
-% total pop
-0.0
-10.0
-0.0
-100.0
-true
-true
-"" ""
-PENS
-"% infected" 1.0 0 -2674135 true "" "plot ((count turtles with [ infected? ] / initial-people) * 100)"
-"% resistance" 1.0 0 -10899396 true "" "plot ((count turtles with [ temp-infection-threshold > 5] / initial-people) * 100)"
-
 SLIDER
 331
 57
@@ -557,10 +544,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-427
-352
-506
-397
+486
+353
+565
+398
 R0
 r0
 2
@@ -628,10 +615,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-1302
-199
-1405
-232
+1311
+189
+1414
+222
 vaccines?
 vaccines?
 0
@@ -641,7 +628,7 @@ vaccines?
 PLOT
 1115
 17
-1315
+1352
 167
 recovery time distribution
 NIL
@@ -649,8 +636,8 @@ NIL
 4.0
 20.0
 0.0
-200.0
-false
+50.0
+true
 false
 "set-histogram-num-bars 20" ""
 PENS
@@ -664,7 +651,7 @@ SLIDER
 vaccination-start
 vaccination-start
 0
-1000
+180
 0.0
 10
 1
@@ -672,14 +659,14 @@ NIL
 HORIZONTAL
 
 SLIDER
-1116
-220
-1288
-253
-vaccination-frequency
-vaccination-frequency
+1109
+227
+1337
+260
+vaccination-window-frequency
+vaccination-window-frequency
 0
-1000
+100
 10.0
 10
 1
@@ -704,7 +691,7 @@ HORIZONTAL
 SLIDER
 1112
 369
-1332
+1374
 402
 mask-infection-chance-reduction
 mask-infection-chance-reduction
@@ -743,10 +730,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-1117
-485
-1248
-518
+1122
+466
+1263
+499
 DoPeopleDie?
 DoPeopleDie?
 0
@@ -776,12 +763,12 @@ deaths
 11
 
 PLOT
-474
-455
-674
-605
+475
+478
+675
+628
 R0
-hours
+week
 R0
 0.0
 10.0
@@ -799,7 +786,7 @@ PLOT
 1103
 650
 deaths
-time
+week
 deaths
 0.0
 10.0
@@ -809,7 +796,7 @@ true
 false
 "" ""
 PENS
-"pen-0" 1.0 0 -7500403 true "" "if (ticks mod 14 = 0) \n[ \nplot deaths\nset deaths 0\n]"
+"pen-0" 1.0 0 -7500403 true "" "if (ticks mod 14 = 0) \n[ \nplot weekly-deaths\nset weekly-deaths 0\n]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1221,6 +1208,61 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="average-infection-threshold">
+      <value value="31"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mask-infection-chance-reduction">
+      <value value="61"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="isolation-chance">
+      <value value="60"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="are-isolating?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="infection-radius">
+      <value value="2.7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="wearing-mask-chance">
+      <value value="63"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="vaccination-window-frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-recovery-time">
+      <value value="9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="immunity-divisor">
+      <value value="1.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="DoPeopleDie?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cured-immunity-bonus">
+      <value value="81"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="vaccination-start">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="infection-chance">
+      <value value="80"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-people">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="average-recovery-chance">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="vaccines?">
+      <value value="true"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
