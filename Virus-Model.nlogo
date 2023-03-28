@@ -94,7 +94,7 @@ to setup-people
 
     ;; Each individual has a 5% chance of starting out infected.
     ;; To mimic true KM conditions use "ask one-of turtles" instead.
-    if (random-float 100 < 5 and not want-vaccinated?)
+    if (random-float 100 < 20 and not want-vaccinated?)
     [
       set infected? true
       set susceptible? false
@@ -533,7 +533,7 @@ hours
 0.0
 10.0
 0.0
-10.0
+100.0
 true
 true
 "" ""
@@ -621,7 +621,7 @@ wearing-mask-chance
 wearing-mask-chance
 0
 100
-31.0
+63.0
 1
 1
 NIL
@@ -776,10 +776,10 @@ deaths
 11
 
 PLOT
-475
-466
-675
-616
+474
+455
+674
+605
 R0
 hours
 R0
@@ -791,7 +791,25 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot r0"
+"default" 1.0 0 -16777216 true "" "if (ticks mod 7 = 0)\n[\nplot r0\n]"
+
+PLOT
+903
+500
+1103
+650
+deaths
+time
+deaths
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"pen-0" 1.0 0 -7500403 true "" "if (ticks mod 14 = 0) \n[ \nplot deaths\nset deaths 0\n]"
 
 @#$#@#$#@
 ## WHAT IS IT?
