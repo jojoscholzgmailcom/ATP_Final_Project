@@ -535,7 +535,7 @@ wearing-mask-chance
 wearing-mask-chance
 0
 100
-40.0
+100.0
 1
 1
 NIL
@@ -568,7 +568,7 @@ vaccination-start
 vaccination-start
 0
 180
-0.0
+210.0
 10
 1
 NIL
@@ -583,7 +583,7 @@ isolation-chance
 isolation-chance
 1
 100
-0.0
+100.0
 1
 1
 NIL
