@@ -181,7 +181,7 @@ end
 
 
 to go
-  if ticks = 210 [stop] ;; 6 months
+  if ticks = 210 [stop] ;; 7 months
 
   if all? turtles [ not infected? ]
     [ stop ]
