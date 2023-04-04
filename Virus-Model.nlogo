@@ -139,12 +139,7 @@ to init-person
     ]
     if recovery-time < 0 [ set recovery-time 0 ]
 
-    ;; Each individual has a 40% chance of getting vaccinated and wanting repeat vaccinations
-    ;;ask n-of ((initial-people / 100) * 40) turtles
-    ;;[
-    ;;  set want-vaccinated? true
-    ;;  set vaccinated? true
-    ;;]
+    ;; Each individual has a 10% chance of getting vaccinated and wanting repeat vaccinations
     if (random-float 100 < 10  and vaccines?)
     [
       set want-vaccinated? true
